@@ -1,10 +1,17 @@
 # Fec_AdE
 
+<p align="center">
+  <img src="https://img.shields.io/badge/Python-3.9%2B-blue?logo=python&logoColor=white" alt="Python 3.9+">
+  <img src="https://img.shields.io/badge/License-MIT-green?logo=opensourceinitiative" alt="MIT License">
+  <img src="https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey?logo=windows" alt="Cross-platform">
+  <img src="https://github.com/andrewilly/Fec_AdE/actions/workflows/build.yml/badge.svg" alt="Build">
+</p>
+
 **Interfaccia CLI per i servizi web dell'Agenzia delle Entrate.**
 
 Consente il download di fatture elettroniche, F24, corrispettivi,
 dichiarazioni dei redditi e documenti dal Cassetto Fiscale — tutto
-da terminale.
+da terminale, senza browser.
 
 ---
 
