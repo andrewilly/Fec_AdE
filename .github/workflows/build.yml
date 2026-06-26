@@ -1,0 +1,162 @@
+name: Build Windows EXE
+
+on:
+  push:
+    tags:
+      - "v*"
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      compile_cli:
+        description: "Compila anche cli.py (oltre a menu.py)"
+        type: boolean
+        default: true
+
+jobs:
+  build:
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        python-version: ["3.12"]
+      fail-fast: false
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+          cache-dependency-path: requirements.txt
+
+      - name: Install system dependencies
+        run: |
+          choco install openssl -y --no-progress
+        shell: powershell
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pyinstaller
+
+      - name: Compile menu.py → menu.exe
+        run: |
+          pyinstaller --onefile `
+            --name menu `
+            --distpath dist `
+            --workpath build `
+            --add-data "app;app" `
+            --hidden-import app.engine `
+            --hidden-import app.engine_mestesso `
+            --hidden-import app.engine_delega `
+            --hidden-import app.engine_intermediario `
+            --hidden-import app.output_manager `
+            --hidden-import app.processor `
+            --hidden-import app.database `
+            --hidden-import app.corrispettivi_engine `
+            --hidden-import app.transfrontaliere_engine `
+            --hidden-import app.cassetto_fiscale_engine `
+            --hidden-import app.deleghe_reader `
+            --hidden-import app.config `
+            --hidden-import app.log_config `
+            --hidden-import app.runner `
+            --hidden-import app.security `
+            --hidden-import app.dichiarazioni_engine `
+            --hidden-import app.f24_engine `
+            --hidden-import app.f24_generici_placeholder `
+            --hidden-import commands `
+            --hidden-import commands.fatture `
+            --hidden-import commands.f24 `
+            --hidden-import commands.cassetto `
+            --hidden-import commands.deleghe `
+            --hidden-import commands.tutto `
+            --hidden-import asn1crypto.cms `
+            --hidden-import lxml.etree `
+            --hidden-import lxml._elementpath `
+            --hidden-import sqlalchemy `
+            --hidden-import cryptography `
+            --collect-submodules app `
+            --collect-submodules commands `
+            menu.py
+        shell: powershell
+
+      - name: Compile cli.py → cli.exe
+        run: |
+          pyinstaller --onefile `
+            --name cli `
+            --distpath dist `
+            --workpath build `
+            --add-data "app;app" `
+            --hidden-import app.engine `
+            --hidden-import app.engine_mestesso `
+            --hidden-import app.engine_delega `
+            --hidden-import app.engine_intermediario `
+            --hidden-import app.output_manager `
+            --hidden-import app.processor `
+            --hidden-import app.database `
+            --hidden-import app.corrispettivi_engine `
+            --hidden-import app.transfrontaliere_engine `
+            --hidden-import app.cassetto_fiscale_engine `
+            --hidden-import app.deleghe_reader `
+            --hidden-import app.config `
+            --hidden-import app.log_config `
+            --hidden-import app.runner `
+            --hidden-import app.security `
+            --hidden-import app.dichiarazioni_engine `
+            --hidden-import app.f24_engine `
+            --hidden-import app.f24_generici_placeholder `
+            --hidden-import commands `
+            --hidden-import commands.fatture `
+            --hidden-import commands.f24 `
+            --hidden-import commands.cassetto `
+            --hidden-import commands.deleghe `
+            --hidden-import commands.tutto `
+            --hidden-import asn1crypto.cms `
+            --hidden-import lxml.etree `
+            --hidden-import lxml._elementpath `
+            --hidden-import sqlalchemy `
+            --hidden-import cryptography `
+            --collect-submodules app `
+            --collect-submodules commands `
+            cli.py
+        shell: powershell
+
+      - name: List build artifacts
+        run: |
+          dir dist\
+        shell: powershell
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: fec-ade-windows-${{ github.ref_name }}
+          path: dist/
+          compression-level: 9
+
+      - name: Create Release (on tag)
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/menu.exe
+            dist/cli.exe
+          name: Release ${{ github.ref_name }}
+          body: |
+            ## Fec_AdE ${{ github.ref_name }}
+
+            ### Windows eseguibili standalone
+
+            - `menu.exe` — Menu interattivo
+            - `cli.exe` — CLI diretta (argparse)
+            
+            ### Note
+            - Python **non** richiesto — gli EXE sono autonomi
+            - Per il Cassetto Fiscale, installa [Playwright](https://playwright.dev/python/) + Chromium
+            - Scarica, estrai, crea `%USERPROFILE%\.fec_ade\config.env` con le tue credenziali
+          draft: false
+          prerelease: false
