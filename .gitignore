@@ -1,0 +1,53 @@
+# === SICUREZZA ===
+# Credenziali e configurazioni sensibili
+.env
+.env.*
+*.csv
+
+# === DATI DI OUTPUT ===
+output/
+*.db
+*.sqlite
+
+# === BUILD OUTPUT ===
+dist/
+build/
+*.spec
+*.exe
+*.strk
+*.manifest
+
+# === AMBIENTI VIRTUALI ===
+venv/
+venv_win/
+.venv/
+
+# === CACHE PYTHON ===
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+.pytest_cache/
+.coverage
+
+# === LOG ===
+log_*.txt
+*.log
+
+# === DATI TEMPORANEI ===
+ragioni_sociali.json
+debug_login_error.html
+download_failures_*.json
+
+# === DIRECTORY ESTERNE ===
+RecuFatture/
+Modelli/
+
+# === IDE / SISTEMA ===
+.DS_Store
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
