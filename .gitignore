@@ -41,7 +41,6 @@ debug_login_error.html
 download_failures_*.json
 
 # === DIRECTORY ESTERNE ===
-RecuFatture/
 Modelli/
 
 # === IDE / SISTEMA ===
